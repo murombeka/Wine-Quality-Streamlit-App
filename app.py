@@ -16,7 +16,7 @@ from joblib import load
 model = load('wine_quality_model.joblib')
 
 # Streamlit app title
-st.title("R207113W Wine Quality Classifier (Red or White)")
+st.title("Privyman Wine Quality Classifier (Red or White)")
 
 # Instructions
 st.write("""
@@ -24,17 +24,22 @@ This app classifies wines into **Red** or **White** based on their physicochemic
 Enter the following wine properties to get the classification result.
 """)
 
-# Define the features expected by the model
+# Define the features expected by the model, including 'quality'
 expected_features = [
     "Fixed Acidity", "Volatile Acidity", "Citric Acid", "Residual Sugar",
     "Chlorides", "Free Sulfur Dioxide", "Total Sulfur Dioxide", 
-    "Density", "pH", "Sulphates", "Alcohol"
+    "Density", "pH", "Sulphates", "Alcohol", "Quality"
 ]
 
 # Create input fields for features
 input_data = []
 for feature in expected_features:
-    value = st.number_input(feature, min_value=0.0, value=0.0)
+    if feature == "Quality":
+        # Quality is an integer value, so use number_input with step=1
+        value = st.number_input(feature, min_value=3, max_value=9, step=1, value=5)
+    else:
+        # For other features, use number_input with float values
+        value = st.number_input(feature, min_value=0.0, value=0.0)
     input_data.append(value)
 
 # Convert input list into a numpy array and reshape
