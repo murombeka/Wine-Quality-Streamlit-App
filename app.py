@@ -7,6 +7,7 @@ Original file is located at
     https://colab.research.google.com/drive/1aH0Hg_FcXBdeQcOXCZtREaOBZU_l6ABW
 """
 
+
 import streamlit as st
 import numpy as np
 from joblib import load
@@ -23,26 +24,27 @@ This app classifies wines into **Red** or **White** based on their physicochemic
 Enter the following wine properties to get the classification result.
 """)
 
-# Create input fields for features
-features = {
-    "Fixed Acidity": st.number_input("Fixed Acidity", min_value=0.0, value=7.0),
-    "Volatile Acidity": st.number_input("Volatile Acidity", min_value=0.0, value=0.5),
-    "Citric Acid": st.number_input("Citric Acid", min_value=0.0, value=0.3),
-    "Residual Sugar": st.number_input("Residual Sugar", min_value=0.0, value=2.0),
-    "Chlorides": st.number_input("Chlorides", min_value=0.0, value=0.08),
-    "Free Sulfur Dioxide": st.number_input("Free Sulfur Dioxide", min_value=0.0, value=15.0),
-    "Total Sulfur Dioxide": st.number_input("Total Sulfur Dioxide", min_value=0.0, value=40.0),
-    "Density": st.number_input("Density", min_value=0.0, value=0.996),
-    "pH": st.number_input("pH", min_value=0.0, value=3.2),
-    "Sulphates": st.number_input("Sulphates", min_value=0.0, value=0.65),
-    "Alcohol": st.number_input("Alcohol", min_value=0.0, value=10.0),
-}
+# Define the features expected by the model
+expected_features = [
+    "Fixed Acidity", "Volatile Acidity", "Citric Acid", "Residual Sugar",
+    "Chlorides", "Free Sulfur Dioxide", "Total Sulfur Dioxide", 
+    "Density", "pH", "Sulphates", "Alcohol"
+]
 
-# Convert input features into a numpy array
-input_data = np.array([list(features.values())]).reshape(1, -1)
+# Create input fields for features
+input_data = []
+for feature in expected_features:
+    value = st.number_input(feature, min_value=0.0, value=0.0)
+    input_data.append(value)
+
+# Convert input list into a numpy array and reshape
+input_array = np.array(input_data).reshape(1, -1)
 
 # Predict button
 if st.button("Predict"):
-    prediction = model.predict(input_data)
-    wine_type = "Red Wine" if prediction[0] == 1 else "White Wine"
-    st.success(f"The model predicts: **{wine_type}**")
+    try:
+        prediction = model.predict(input_array)
+        wine_type = "Red Wine" if prediction[0] == 1 else "White Wine"
+        st.success(f"The model predicts: **{wine_type}**")
+    except ValueError as e:
+        st.error(f"Prediction failed. Error: {e}")
